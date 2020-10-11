@@ -81,7 +81,7 @@ namespace vcdstarJson
 		return 0;
 	}
 
-	// 把node初始化了
+	// 把node初始化了，恢复值为默认
 	int init_node_val(JsonNode*& node_) {
 		node_->_type = NodeType::type_undefined;
 		node_->_key.clear();
@@ -109,6 +109,32 @@ namespace vcdstarJson
 		return 0;
 	}
 
+
+	int deep_copy_node(JsonNode*& src, JsonNode*& dst, JsonNode* father, JsonNode* prev) {
+		if (src == nullptr || dst != nullptr)// 必须为空，重头创建，方便递归
+			return -1;
+		dst = new JsonNode();
+		dst->_type = src->_type;
+		if (src->_type == NodeType::type_object) {
+			deep_copy_node(src->obj_val, dst->obj_val, src, nullptr);
+		}
+		else if (src->_type == NodeType::type_array) {
+			deep_copy_node(src->arr_val, dst->arr_val, src, nullptr);
+		}
+		dst->_key = src->_key;
+		dst->d_val = src->d_val;
+		dst->i_val = src->i_val;
+		dst->str_val = src->str_val;
+		dst->b_val = src->b_val;
+		dst->arrLen = src->arrLen;
+		dst->father = father;
+		dst->prev = prev;
+		if (src->next != nullptr) {
+			deep_copy_node(src->next, dst->next, father, dst);
+		}
+		return 0;
+	}
+
 	// 主要的json对象
 	class Json
 	{
@@ -117,6 +143,7 @@ namespace vcdstarJson
 		Json() : root_node(nullptr), m_bDelete(false), m_iArrLen(-1), m_nodeType(NodeType::type_undefined) {
 
 		}
+		
 		// 构造方法，从string流中生成对象
 		Json(string& strJson) : m_bDelete(true), m_iArrLen(-1), m_nodeType(NodeType::type_undefined)
 		{
@@ -325,6 +352,32 @@ namespace vcdstarJson
 			}
 		}
 
+		// object重载=json
+		void operator=(Json _val) {
+			_val.m_bDelete = false;
+			if (root_node != nullptr && _val.root_node != nullptr && (_val.m_nodeType == NodeType::type_array || _val.m_nodeType == NodeType::type_object)) {
+				if (m_nodeType == NodeType::type_object || m_nodeType == NodeType::type_array) {
+					if (root_node->father == nullptr)// 当前是根节点对象，不允许修改
+						return;
+					root_node = root_node->father;
+				}
+				JsonNode* node_tmp = nullptr;
+				deep_copy_node(_val.root_node, node_tmp, root_node, nullptr);
+				string _key = root_node->_key;
+				init_node_val(root_node);
+				root_node->_key = _key;
+				if (_val.m_nodeType == NodeType::type_array) {
+					root_node->_type = NodeType::type_array;
+					root_node->arrLen = _val.m_iArrLen;
+					root_node->arr_val = node_tmp;
+				}
+				else if (_val.m_nodeType == NodeType::type_object) {
+					root_node->_type = NodeType::type_object;
+					root_node->obj_val = node_tmp;
+				}
+			}
+		}
+
 		// 转成string对象
 		string toString() {
 			string ret;
@@ -484,12 +537,6 @@ namespace vcdstarJson
 			}
 			str_json += "]";
 		}
-
-
-		//私有的构造方法，用来重载[]
-		/*Json(JsonNode* _node = nullptr) : m_bDelete(false), m_iArrLen(-1), m_nodeType(NodeType::type_undefined) {
-
-		}*/
 
 		// 解析json Object对象
 		int parse_obj(JsonNode*& node_, string& str_json, int& start_index)
