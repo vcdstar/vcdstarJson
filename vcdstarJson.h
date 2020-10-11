@@ -204,14 +204,22 @@ namespace vcdstarJson
 		Json operator[](int _index) {
 			if (root_node == nullptr)// 数组不能通过[]的方式来创建对象，如果对象没有创建直接返回空
 				return Json(nullptr, false, -1, NodeType::type_undefined);
-			if (root_node != nullptr && m_nodeType != NodeType::type_array)// 防止数组越界
-				return Json(nullptr, false, -1, NodeType::type_undefined);
-			if (m_iArrLen <= -1)
+			if (m_nodeType != NodeType::type_array || m_iArrLen <= -1)// 必须是数组类型
 				return Json(nullptr, false, -1, NodeType::type_undefined);
 			if (_index < 0 || _index >= m_iArrLen)// 防止数组越界
 				return Json(nullptr, false, -1, NodeType::type_undefined);
 
 			JsonNode* next_ = root_node;// 用来遍历的节点
+			int iIndex = -1;// 计数
+			while (++iIndex != _index) {
+				next_ = next_->next;
+			}
+			if (next_->_type == NodeType::type_object)
+				return Json(next_->obj_val, false, -1, NodeType::type_object);
+			else if (next_->_type == NodeType::type_array)
+				return Json(next_->arr_val, false, next_->arrLen, NodeType::type_array);
+			else
+				return Json(next_, false, -1, next_->_type);
 		}
 
 		// object重载=int
