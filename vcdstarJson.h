@@ -173,6 +173,14 @@ namespace vcdstarJson
 			}
 		}
 
+		// 拷贝构造函数，防止传进来的对象被delete
+		Json(const Json& j) {
+			m_bDelete = false;// 是否需要删除
+			m_iArrLen = j.m_iArrLen;// 数组长度
+			m_nodeType = j.m_nodeType;// 节点类型
+			root_node = j.root_node;// 根节点
+		}
+
 		// 析构方法，如果需要删除根节点
 		~Json() {
 			if (m_bDelete) {
@@ -399,7 +407,7 @@ namespace vcdstarJson
 			m_iArrLen = iArrLen;
 			m_nodeType = nodetype;
 		}
-		
+
 		// object 转 string 对象
 		void obj_to_string(JsonNode* node_, string& str_json) {
 			str_json += "{";
