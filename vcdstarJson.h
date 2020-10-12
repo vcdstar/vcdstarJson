@@ -109,7 +109,7 @@ namespace vcdstarJson
 		return 0;
 	}
 
-
+	// 深拷贝node的值
 	int deep_copy_node(JsonNode*& src, JsonNode*& dst, JsonNode* father, JsonNode* prev) {
 		if (src == nullptr || dst != nullptr)// 必须为空，重头创建，方便递归
 			return -1;
@@ -413,6 +413,53 @@ namespace vcdstarJson
 			m_nodeType = NodeType::type_array;
 			m_bDelete = true;
 			m_iArrLen = 0;
+		}
+
+		// ------以下是数组的方法--------
+		// 数组添加int对象
+		bool add(const int _val) {
+			long long l_val = _val;
+			return add(l_val);
+		}
+
+		// 数组添加short对象
+		bool add(const short _val) {
+			long long l_val = _val;
+			return add(l_val);
+		}
+
+		// 数组添加long对象
+		bool add(const long _val) {
+			long long l_val = _val;
+			return add(l_val);
+		}
+
+		// 数组添加longlong对象
+		bool add(const long long _val) {
+			if (root_node == nullptr || m_nodeType != NodeType::type_array)
+				return false;
+			JsonNode* next = root_node;// 用来找可以add的对象
+			while (next != nullptr) {
+				if (next->_type == NodeType::type_undefined)
+				{
+					m_iArrLen++;
+					next->_type = NodeType::type_int;
+					next->i_val = _val;
+					return true;
+				}
+				if (next->next == nullptr) {
+					m_iArrLen++;
+					next->next = new JsonNode();
+					next->next->father = next->father;
+					next->next->prev = next;
+					next->next->_type = NodeType::type_int;
+					next->next->i_val = _val;
+					return true;
+				}
+				next = next->next;
+			}
+
+			return true;
 		}
 
 		// 转成string对象
