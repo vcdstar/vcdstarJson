@@ -362,7 +362,15 @@ namespace vcdstarJson
 
 		// object重载=json
 		void operator=(Json _val) {
-			_val.m_bDelete = false;
+			_val.m_bDelete = false;// 防止函数退出后析构，把传进来的节点值给删除了
+			if (root_node == nullptr && _val.root_node != nullptr && (_val.m_nodeType == NodeType::type_array || _val.m_nodeType == NodeType::type_object))// 考虑到直接赋值的情况
+			{
+				deep_copy_node(_val.root_node, root_node, root_node, nullptr);
+				m_bDelete = true;
+				m_iArrLen = _val.m_iArrLen;
+				m_nodeType = _val.m_nodeType;
+				return;
+			}
 			if (root_node != nullptr && _val.root_node != nullptr && (_val.m_nodeType == NodeType::type_array || _val.m_nodeType == NodeType::type_object)) {
 				if (m_nodeType == NodeType::type_object || m_nodeType == NodeType::type_array) {
 					if (root_node->father == nullptr)// 当前是根节点对象，不允许修改
