@@ -394,6 +394,27 @@ namespace vcdstarJson
 			}
 		}
 
+		// 创建空的object对象
+		bool createEmptyObject() {
+			if (root_node != nullptr)
+				return false;
+
+			root_node = new JsonNode();
+			m_nodeType = NodeType::type_object;
+			m_bDelete = true;
+		}
+
+		// 创建空的array对象
+		bool createEmptyArray() {
+			if (root_node != nullptr)
+				return false;
+
+			root_node = new JsonNode();
+			m_nodeType = NodeType::type_array;
+			m_bDelete = true;
+			m_iArrLen = 0;
+		}
+
 		// 转成string对象
 		string toString() {
 			string ret;
