@@ -522,7 +522,7 @@ namespace vcdstarJson
 				obj_to_string(root_node, ret);
 			}
 			else if (m_nodeType == NodeType::type_array) {
-				obj_to_array(root_node, ret);
+				arr_to_string(root_node, ret);
 			}
 			return ret;
 		}
@@ -544,10 +544,14 @@ namespace vcdstarJson
 				if (next->_type == NodeType::type_undefined)
 				{
 					m_iArrLen++;
+					if (root_node->father != nullptr)
+						root_node->father->arrLen = m_iArrLen;
 					return next;
 				}
 				if (next->next == nullptr) {
 					m_iArrLen++;
+					if (root_node->father != nullptr)
+						root_node->father->arrLen = m_iArrLen;
 					next->next = new JsonNode();
 					next->next->father = next->father;
 					next->next->prev = next;
@@ -622,7 +626,7 @@ namespace vcdstarJson
 					}
 					else if (node_tmp->_type == NodeType::type_array) {
 						str_json += "\":";
-						obj_to_array(node_tmp->arr_val, str_json);
+						arr_to_string(node_tmp->arr_val, str_json);
 					}
 				}
 				node_tmp = node_tmp->next;
@@ -631,7 +635,7 @@ namespace vcdstarJson
 		}
 
 		// array ×ª string ¶ÔÏó
-		void obj_to_array(JsonNode* node_, string& str_json) {
+		void arr_to_string(JsonNode* node_, string& str_json) {
 			str_json += "[";
 			JsonNode* node_tmp = node_;
 			bool bFirst = true;
@@ -688,7 +692,7 @@ namespace vcdstarJson
 						obj_to_string(node_tmp->obj_val, str_json);
 					}
 					else if (node_tmp->_type == NodeType::type_array) {
-						obj_to_array(node_tmp->arr_val, str_json);
+						arr_to_string(node_tmp->arr_val, str_json);
 					}
 				}
 				node_tmp = node_tmp->next;
