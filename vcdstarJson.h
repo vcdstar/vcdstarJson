@@ -436,7 +436,7 @@ namespace vcdstarJson
 
 		// 数组添加longlong对象
 		bool add(const long long _val) {
-			JsonNode* node = find_arr_use_node();
+			JsonNode* node = find_arr_add_node();
 			if (node == nullptr)
 				return false;
 			node->_type = NodeType::type_int;
@@ -452,7 +452,7 @@ namespace vcdstarJson
 
 		// 数组添加double对象
 		bool add(const double _val) {
-			JsonNode* node = find_arr_use_node();
+			JsonNode* node = find_arr_add_node();
 			if (node == nullptr)
 				return false;
 			node->_type = NodeType::type_double;
@@ -462,7 +462,7 @@ namespace vcdstarJson
 
 		// 数组添加string对象
 		bool add(const string _val) {
-			JsonNode* node = find_arr_use_node();
+			JsonNode* node = find_arr_add_node();
 			if (node == nullptr)
 				return false;
 			node->_type = NodeType::type_string;
@@ -472,7 +472,7 @@ namespace vcdstarJson
 
 		// 数组添加bool对象
 		bool add(const bool _val) {
-			JsonNode* node = find_arr_use_node();
+			JsonNode* node = find_arr_add_node();
 			if (node == nullptr)
 				return false;
 			node->_type = NodeType::type_bool;
@@ -482,7 +482,7 @@ namespace vcdstarJson
 
 		// 数组添加null对象
 		bool add() {
-			JsonNode* node = find_arr_use_node();
+			JsonNode* node = find_arr_add_node();
 			if (node == nullptr)
 				return false;
 			node->_type = NodeType::type_null;
@@ -494,7 +494,7 @@ namespace vcdstarJson
 			_val.m_bDelete = false;// 防止函数退出后析构，把传进来的节点值给删除了
 			if (_val.root_node == nullptr || (_val.m_nodeType != NodeType::type_array && _val.m_nodeType != NodeType::type_object))// 要增加的节点不能为空,也不能为数组或者对象以外的节点
 				return false;
-			JsonNode* node = find_arr_use_node();
+			JsonNode* node = find_arr_add_node();
 			if (node == nullptr)
 				return false;
 
@@ -508,6 +508,112 @@ namespace vcdstarJson
 			else if (_val.m_nodeType == NodeType::type_object) {
 				node->_type = NodeType::type_object;
 				node->obj_val = node_tmp;
+			}
+
+			return true;
+		}
+
+		// 数组insert null方法
+		bool insert(int _index) {
+			JsonNode* node = find_arr_insert_node(_index);
+			if (node == nullptr)
+				return false;
+
+			node->_type = NodeType::type_null;
+			return true;
+		}
+
+		// 数组insert int方法
+		bool insert(int _index, const int _val) {
+			long long l_val = _val;
+			return insert(_index, l_val);
+		}
+
+		// 数组insert short方法
+		bool insert(int _index, const short _val) {
+			long long l_val = _val;
+			return insert(_index, l_val);
+		}
+
+		// 数组insert long方法
+		bool insert(int _index, const long _val) {
+			long long l_val = _val;
+			return insert(_index, l_val);
+		}
+
+		// 数组insert longlong方法
+		bool insert(int _index, const long long _val) {
+			JsonNode* node = find_arr_insert_node(_index);
+			if (node == nullptr)
+				return false;
+
+			node->_type = NodeType::type_int;
+			node->i_val = _val;
+			return true;
+		}
+
+		// 数组insert float方法
+		bool insert(int _index, const float _val) {
+			double d_val = _val;
+			return insert(_index, d_val);
+		}
+
+		// 数组insert double方法
+		bool insert(int _index, const double _val) {
+			JsonNode* node = find_arr_insert_node(_index);
+			if (node == nullptr)
+				return false;
+
+			node->_type = NodeType::type_double;
+			node->d_val = _val;
+			return true;
+		}
+
+		// 数组insert bool方法
+		bool insert(int _index, const bool _val) {
+			JsonNode* node = find_arr_insert_node(_index);
+			if (node == nullptr)
+				return false;
+
+			node->_type = NodeType::type_bool;
+			node->b_val = _val;
+			return true;
+		}
+
+		// 数组insert string方法
+		bool insert(int _index, const string _val) {
+			JsonNode* node = find_arr_insert_node(_index);
+			if (node == nullptr)
+				return false;
+
+			node->_type = NodeType::type_string;
+			node->str_val = _val;
+			return true;
+		}
+		
+		// 数组insert json方法
+		bool insert(int _index, Json _val) {
+			_val.m_bDelete = false;
+			if (_val.m_nodeType != NodeType::type_array && _val.m_nodeType != NodeType::type_object)
+				return false;
+
+			JsonNode* node_tmp = nullptr;
+			deep_copy_node(_val.root_node, node_tmp, root_node, nullptr);
+
+			JsonNode* node = find_arr_insert_node(_index);
+			if (node == nullptr) {
+				release_node(node_tmp);
+				return false;
+			}
+
+			if (_val.m_nodeType == NodeType::type_array) {
+				node->arr_val = node_tmp;
+				node->_type = NodeType::type_array;
+				node->arrLen = _val.m_iArrLen;
+			}
+			else {
+				node->obj_val = node_tmp;
+				node->_type = NodeType::type_object;
 			}
 
 			return true;
@@ -536,7 +642,7 @@ namespace vcdstarJson
 		}
 
 		// 查找数组中可以add操作的节点
-		JsonNode* find_arr_use_node() {
+		JsonNode* find_arr_add_node() {
 			if (root_node == nullptr || m_nodeType != NodeType::type_array)
 				return nullptr;
 			JsonNode* next = root_node;// 用来找可以add的对象
@@ -560,6 +666,35 @@ namespace vcdstarJson
 				next = next->next;
 			}
 			return nullptr;
+		}
+
+		// 查找数组中可以insert操作的结果
+		JsonNode* find_arr_insert_node(int _index) {
+			if (root_node == nullptr || m_iArrLen < 0 || m_iArrLen <= _index || m_nodeType != NodeType::type_array)
+				return nullptr;
+
+			JsonNode* next = root_node;// 用来找可以add的对象
+			int iIndex = -1;
+			while (++iIndex != _index) {
+				next = next->next;
+			}
+			m_iArrLen++;
+			if (root_node->father != nullptr)
+				root_node->father->arrLen++;
+
+			JsonNode* new_node = new JsonNode();
+			new_node->father = next->father;
+			new_node->prev = next->prev;
+
+			if (next->prev != nullptr) {
+				next->prev->next = new_node;
+			}
+			new_node->next = next;
+			next->prev = new_node;
+			if (_index == 0)// 防止插入0的时候找不到头节点
+				root_node = new_node;
+
+			return new_node;
 		}
 
 		// object 转 string 对象
