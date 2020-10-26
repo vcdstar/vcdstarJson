@@ -1,0 +1,59 @@
+{
+    "test1": 111,
+    "test2": 0.222,
+    "test3": true,
+    "test4": null,
+    "test5": "5555",
+    "test6": {
+        "test1": 111,
+        "test2": 0.222,
+        "test3": true,
+        "test4": null,
+        "test5": "5555",
+        "test6": {
+            "test1": 111,
+            "test2": 0.222,
+            "test3": true,
+            "test4": null,
+            "test5": "5555",
+            "test6": {},
+            "test7": [
+                111,
+                0.222,
+                true,
+                null,
+                "555",
+                {},
+                []
+            ]
+        },
+        "test7": []
+    },
+    "test7": [
+        111,
+        0.222,
+        true,
+        null,
+        "555",
+        {
+            "test1": 111,
+            "test2": 0.222,
+            "test3": true,
+            "test4": null,
+            "test5": "5555",
+            "test6": {},
+            "test7": []
+        },
+        [
+            111,
+            0.222,
+            true,
+            null,
+            "555",
+            {},
+            []
+        ]
+    ],
+    "test8": {},
+    "test9": []
+}
