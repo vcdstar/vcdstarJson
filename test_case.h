@@ -379,3 +379,156 @@ void operator_null(Json j)
 	cout << j2.toJsonString() << "--size:" << j2.arrLen() << endl;
 }
 
+// test =json obj
+void operator_obj(Json j)
+{
+	Json j1;
+	j1["j1"] = string("111");
+	Json j2;
+	j2["j2"] = 222;
+	Json j3;
+	j3["j3"] = 0.333;
+	// 数组
+	j["test7"][0] = j1;
+	j["test7"][1] = j1;
+	j["test7"][2] = j1;
+	j["test7"][3] = j1;
+	j["test7"][4] = j1;
+	j["test7"][5] = j1;
+	j["test7"][6] = j1;
+	cout << j.toJsonString() << "--size:" << j["test7"].arrLen() << endl;
+	// 对象
+	j["test6"]["test1"] = j1;
+	j["test6"]["test2"] = j1;
+	j["test6"]["test3"] = j1;
+	j["test6"]["test4"] = j1;
+	j["test6"]["test5"] = j1;
+	j["test6"]["test6"] = j1;
+	j["test6"]["test7"] = j1;
+	cout << j.toJsonString() << endl;
+	// 空数组
+	j["test9"].add(j1);
+	j["test9"].add(j2);
+	j["test9"].add(j3);
+	cout << j.toJsonString() << "--size:" << j["test9"].arrLen() << endl;
+	// 数组insert
+	j["test9"].insert(0, j1);
+	j["test9"].insert(1, j1);
+	j["test9"].insert(2, j2);
+	j["test9"].insert(3, j3);
+	cout << j.toJsonString() << "--size:" << j["test9"].arrLen() << endl;
+	// 空对象
+	j["test8"]["test1"] = j1;
+	j["test8"]["test1"] = j2;
+	j["test8"]["test2"] = j3;
+	j["test8"]["test3"] = j1;
+	cout << j.toJsonString() << endl;
+	// 整个替换=int
+	j["test1"] = j1;
+	j["test2"] = j2;
+	j["test3"] = j3;
+	j["test4"] = j2;
+	j["test5"] = j3;
+	j["test6"] = j1;
+	j["test7"] = j2;
+	j["test8"] = j3;
+	j["test9"] = j1;
+	cout << j.toJsonString() << endl;
+	// 空json=int
+	Json j11;
+	j11["test1"] = j1;
+	j11["test2"] = j2;
+	j11["test3"] = j3;
+	j11["test1"] = j2;
+	j11.add(j1);
+	j11.insert(0, j2);
+	cout << j11.toJsonString() << "--size:" << j11.arrLen() << endl;
+	// 空json add 和 insert int
+	Json j22;
+	j22.createEmptyArray();
+	j22["test1"] = j1;
+	j22.add(j1);
+	j22.add(j1);
+	j22.insert(0, j1);
+	j22.insert(1, j1);
+	j22.insert(2, j1);
+	cout << j22.toJsonString() << "--size:" << j22.arrLen() << endl;
+}
+// test =json arr
+void operator_arr(Json j)
+{
+	Json j1;
+	j1["j1"] = string("111");
+	Json j2;
+	j2["j2"] = 222;
+	Json j3;
+	j3["j3"] = 0.333;
+	Json j4;
+	j4.createEmptyArray();
+	// 数组
+	j["test7"][0] = j1;
+	j["test7"][1] = j2;
+	j["test7"][2] = j3;
+	j["test7"][3] = j4;
+	j["test7"][4] = j1;
+	j["test7"][5] = j2;
+	j["test7"][6] = j3;
+	cout << j.toJsonString() << endl << "--size:" << j["test7"].arrLen() << endl;
+	// 对象
+	j["test6"]["test1"] = j1;
+	j["test6"]["test2"] = j2;
+	j["test6"]["test3"] = j3;
+	j["test6"]["test4"] = j4;
+	j["test6"]["test5"] = j1;
+	j["test6"]["test6"] = j2;
+	j["test6"]["test7"] = j3;
+	cout << j.toJsonString() << endl;
+	// 空数组
+	j["test9"].add(j1);
+	j["test9"].add(j2);
+	j["test9"].add(j3);
+	cout << j.toJsonString() << endl <<  "--size:" << j["test9"].arrLen() << endl;
+	// 数组insert
+	j["test9"].insert(0, j1);
+	j["test9"].insert(1, j1);
+	j["test9"].insert(2, j2);
+	j["test9"].insert(3, j3);
+	cout << j.toJsonString() << endl << "--size:" << j["test9"].arrLen() << endl;
+	// 空对象
+	j["test8"]["test1"] = j1;
+	j["test8"]["test1"] = j2;
+	j["test8"]["test2"] = j3;
+	j["test8"]["test3"] = j1;
+	cout << j.toJsonString() << endl;
+	// 整个替换=int
+	j["test1"] = j1;
+	j["test2"] = j2;
+	j["test3"] = j3;
+	j["test4"] = j4;
+	j["test5"] = j1;
+	j["test6"] = j2;
+	j["test7"] = j3;
+	j["test8"] = j4;
+	j["test9"] = j1;
+	cout << j.toJsonString() << endl;
+	// 空json=int
+	Json j11;
+	j11["test1"] = j1;
+	j11["test2"] = j2;
+	j11["test3"] = j3;
+	j11["test1"] = j4;
+	j11.add(j1);
+	j11.insert(0, j2);
+	cout << j11.toJsonString() << endl << "--size:" << j11.arrLen() << endl;
+	// 空json add 和 insert int
+	Json j22;
+	j22.createEmptyArray();
+	j22["test1"] = j1;
+	j22.add(j1);
+	j22.add(j2);
+	j22.insert(0, j3);
+	j22.insert(1, j4);
+	j22.insert(2, j1);
+	cout << j22.toJsonString() << "--size:" << j22.arrLen() << endl;
+}
+
