@@ -98,7 +98,7 @@ namespace vcdstar
 		std::string JosnArrayToString(std::vector<VcdstarJson*>* obj, int deep, std::string prefix = "", std::string indent = "");
 		std::string ToJsonString(const std::string& src);
 
-		bool AddJsonNode(VcdstarJson* jsonObj, int iType);
+		bool AddJsonNode(VcdstarJson* jsonObj, int iType, bool bNeedPush);
 		bool InsertJsonNode(const int& Position, VcdstarJson* jsonObj);
 		VcdstarJson* CheckSame(const std::string& key);
 
@@ -114,7 +114,7 @@ namespace vcdstar
 			std::vector<VcdstarJson*>*	m_LstVal;
 		};
 		int					m_iType;
-		// char test[81920];
+		char test0[16384];
 	};
 }
 
