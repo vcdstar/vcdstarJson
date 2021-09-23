@@ -31,6 +31,7 @@ namespace vcdstar
 		VcdstarJson operator=(const bool& bVal);
 		VcdstarJson operator=(const std::string& strVal);
 		VcdstarJson operator=(const char* strVal);
+		VcdstarJson SetNull();
 
 		bool LoadPath(const std::string& strPath);
 		bool LoadString(const std::string& strJson);
@@ -95,9 +96,11 @@ namespace vcdstar
 
 		std::string JosnObjectToString(std::vector<VcdstarJson*>* obj, int deep, std::string prefix = "", std::string indent = "");
 		std::string JosnArrayToString(std::vector<VcdstarJson*>* obj, int deep, std::string prefix = "", std::string indent = "");
+		std::string ToJsonString(const std::string& src);
 
 		bool AddJsonNode(VcdstarJson* jsonObj, int iType);
 		bool InsertJsonNode(const int& Position, VcdstarJson* jsonObj);
+		VcdstarJson* CheckSame(const std::string& key);
 
 		void CopyJson(const VcdstarJson* const src, VcdstarJson* dst);
 	private:

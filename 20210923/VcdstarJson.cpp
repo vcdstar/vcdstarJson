@@ -154,6 +154,14 @@ VcdstarJson VcdstarJson::operator=(const char* strVal)
 	return *this;
 }
 
+VcdstarJson VcdstarJson::SetNull()
+{
+	std::string strLastKey = m_strKey;
+	ReleaseThis();
+	m_strKey = strLastKey;
+	return *this;
+}
+
 bool VcdstarJson::LoadPath(const std::string& strPath)
 {
 	int size = 0;
@@ -508,31 +516,13 @@ bool VcdstarJson::Insert(const int& position, const VcdstarJson& jsonObj)
 
 bool VcdstarJson::AddNull(const std::string& strKey)
 {
-	VcdstarJson* jsonObj = new VcdstarJson();
-	jsonObj->m_strKey = strKey;
-	if (m_iType == TypeObject)
-	{
-		m_LstVal->push_back(jsonObj);
-		return true;
-	}
-	else if (m_iType == TypeNull)
-	{
-		m_LstVal = new std::vector<VcdstarJson*>();
-		m_LstVal->push_back(jsonObj);
-		m_iType = TypeObject;
-		return true;
-	}
-	else
-	{
-		delete jsonObj;
-	}
-	return false;
+	VcdstarJson* jsonObj = CheckSame(strKey);
+	return AddJsonNode(jsonObj, TypeObject);
 }
 
 bool VcdstarJson::Add(const std::string& strKey, const bool& bVal)
 {
-	VcdstarJson* jsonObj = new VcdstarJson();
-	jsonObj->m_strKey = strKey;
+	VcdstarJson* jsonObj = CheckSame(strKey);
 	jsonObj->m_bVal = bVal;
 	jsonObj->m_iType = TypeBool;
 	return AddJsonNode(jsonObj, TypeObject);
@@ -540,8 +530,7 @@ bool VcdstarJson::Add(const std::string& strKey, const bool& bVal)
 
 bool VcdstarJson::Add(const std::string& strKey, const int& iVal)
 {
-	VcdstarJson* jsonObj = new VcdstarJson();
-	jsonObj->m_strKey = strKey;
+	VcdstarJson* jsonObj = CheckSame(strKey);
 	jsonObj->m_iVal = (int)iVal;
 	jsonObj->m_iType = TypeInt;
 	return AddJsonNode(jsonObj, TypeObject);
@@ -549,8 +538,7 @@ bool VcdstarJson::Add(const std::string& strKey, const int& iVal)
 
 bool VcdstarJson::Add(const std::string& strKey, const long long& llVal)
 {
-	VcdstarJson* jsonObj = new VcdstarJson();
-	jsonObj->m_strKey = strKey;
+	VcdstarJson* jsonObj = CheckSame(strKey);
 	jsonObj->m_iVal = llVal;
 	jsonObj->m_iType = TypeInt;
 	return AddJsonNode(jsonObj, TypeObject);
@@ -558,8 +546,7 @@ bool VcdstarJson::Add(const std::string& strKey, const long long& llVal)
 
 bool VcdstarJson::Add(const std::string& strKey, const double& dVal)
 {
-	VcdstarJson* jsonObj = new VcdstarJson();
-	jsonObj->m_strKey = strKey;
+	VcdstarJson* jsonObj = CheckSame(strKey);
 	jsonObj->m_dVal = dVal;
 	jsonObj->m_iType = TypeDouble;
 	return AddJsonNode(jsonObj, TypeObject);
@@ -567,8 +554,7 @@ bool VcdstarJson::Add(const std::string& strKey, const double& dVal)
 
 bool VcdstarJson::Add(const std::string& strKey, const std::string& strVal)
 {
-	VcdstarJson* jsonObj = new VcdstarJson();
-	jsonObj->m_strKey = strKey;
+	VcdstarJson* jsonObj = CheckSame(strKey);
 	jsonObj->m_strVal = new std::string(strVal);
 	jsonObj->m_iType = TypeString;
 	return AddJsonNode(jsonObj, TypeObject);
@@ -576,8 +562,7 @@ bool VcdstarJson::Add(const std::string& strKey, const std::string& strVal)
 
 bool VcdstarJson::Add(const std::string& strKey, const char* strVal)
 {
-	VcdstarJson* jsonObj = new VcdstarJson();
-	jsonObj->m_strKey = strKey;
+	VcdstarJson* jsonObj = CheckSame(strKey);
 	jsonObj->m_strVal = new std::string(strVal);
 	jsonObj->m_iType = TypeString;
 	return AddJsonNode(jsonObj, TypeObject);
@@ -585,7 +570,7 @@ bool VcdstarJson::Add(const std::string& strKey, const char* strVal)
 
 bool VcdstarJson::Add(const std::string& strKey, const VcdstarJson& jsonObj)
 {
-	VcdstarJson* jsonObj_ = new VcdstarJson();
+	VcdstarJson* jsonObj_ = CheckSame(strKey);
 	if (m_iType == TypeObject)
 	{
 		CopyJson(&jsonObj, jsonObj_);
@@ -793,6 +778,8 @@ int VcdstarJson::ParseString(const std::string& strJson, int iIndex, std::string
 				(*jsonStr) += '\n';
 			else if (strJson[iRet] == 'r')
 				(*jsonStr) += '\r';
+			else if (strJson[iRet] == '"')
+				(*jsonStr) += '\"';
 			else {
 				(*jsonStr) += '\\';
 				(*jsonStr) += strJson[iRet];
@@ -892,7 +879,7 @@ std::string VcdstarJson::JosnObjectToString(std::vector<VcdstarJson*>* obj, int 
 		else if ((*it)->m_iType == TypeString)
 		{
 			strRet.append("\"");
-			strRet.append(*((*it)->m_strVal));
+			strRet.append(ToJsonString(*((*it)->m_strVal)));
 			strRet.append("\"");
 		}
 		else if ((*it)->m_iType == TypeBool)
@@ -954,7 +941,9 @@ std::string VcdstarJson::JosnArrayToString(std::vector<VcdstarJson*>* obj, int d
 		}
 		else if ((*it)->m_iType == TypeString)
 		{
-			strRet.append(*((*it)->m_strVal));
+			strRet.append("\"");
+			strRet.append(ToJsonString(*((*it)->m_strVal)));
+			strRet.append("\"");
 		}
 		else if ((*it)->m_iType == TypeBool)
 		{
@@ -982,6 +971,31 @@ std::string VcdstarJson::JosnArrayToString(std::vector<VcdstarJson*>* obj, int d
 	return strRet;
 }
 
+std::string VcdstarJson::ToJsonString(const std::string& src)
+{
+	std::string strRet;
+	for (int i = 0; i < src.size(); ++i)
+	{
+		if (src[i] == '\n')
+			strRet.append("\\n");
+		else if (src[i] == '\t')
+			strRet.append("\\t");
+		else if (src[i] == '\r')
+			strRet.append("\\r");
+		else if (src[i] == '\f')
+			strRet.append("\\f");
+		else if (src[i] == '\b')
+			strRet.append("\\b");
+		else if (src[i] == '\\')
+			strRet.append("\\\\");
+		else if (src[i] == '"')
+			strRet.append("\\\"");
+		else
+			strRet += src[i];
+	}
+	return strRet;
+}
+
 bool VcdstarJson::AddJsonNode(VcdstarJson* jsonObj, int iType)
 {
 	if (m_iType == iType)
@@ -1005,13 +1019,30 @@ bool VcdstarJson::AddJsonNode(VcdstarJson* jsonObj, int iType)
 
 bool VcdstarJson::InsertJsonNode(const int& Position, VcdstarJson* jsonObj)
 {
-	if (m_iType != TypeArray || Position < 0 || Position >= m_LstVal->size() - 1)
+	if (m_iType != TypeArray || Position < 0 || Position >= m_LstVal->size())
 	{
 		delete jsonObj;
 		return false;
 	}
 	m_LstVal->insert(m_LstVal->begin() + Position, jsonObj);
 	return true;
+}
+
+VcdstarJson* VcdstarJson::CheckSame(const std::string& key)
+{
+	if (m_iType == TypeObject)
+		for (std::vector<VcdstarJson*>::iterator it = m_LstVal->begin()
+			; it != m_LstVal->end(); it++)
+		{
+			if ((*it)->m_strKey == std::string(key))
+			{
+				(*it)->ReleaseThis();
+				return *it;
+			}
+		}
+	VcdstarJson* jsonRet = new VcdstarJson();
+	jsonRet->m_strKey = key;
+	return jsonRet;
 }
 
 void VcdstarJson::CopyJson(const VcdstarJson* const src, VcdstarJson* dst)
