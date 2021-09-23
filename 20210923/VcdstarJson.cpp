@@ -226,9 +226,8 @@ int VcdstarJson::GetCount()
 
 VcdstarJson& VcdstarJson::operator[](const char* key)
 {
-	VcdstarJson jsonObj;
 	if (m_iType != TypeObject)
-		return jsonObj;
+		return *this;
 	for (std::vector<VcdstarJson*>::iterator it = m_LstVal->begin()
 		; it != m_LstVal->end(); it++)
 	{
@@ -237,7 +236,7 @@ VcdstarJson& VcdstarJson::operator[](const char* key)
 			return **it;
 		}
 	}
-	return jsonObj;
+	return *this;
 }
 
 VcdstarJson& VcdstarJson::operator[](const std::string& key)
@@ -247,9 +246,8 @@ VcdstarJson& VcdstarJson::operator[](const std::string& key)
 
 VcdstarJson& VcdstarJson::operator[](const int key)
 {
-	VcdstarJson jsonObj;
 	if (key >= m_LstVal->size() || key < 0)
-		return jsonObj;
+		return *this;
 	return *(*m_LstVal)[key];
 }
 
