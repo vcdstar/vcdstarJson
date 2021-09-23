@@ -34,7 +34,7 @@ namespace vcdstar
 		VcdstarJson SetNull();
 
 		bool LoadPath(const std::string& strPath);
-		bool LoadString(const std::string& strJson);
+		bool LoadJson(const std::string& strJson);
 		bool ParseJson(const std::string& strJson);
 		std::string ToString(std::string prefix = "", std::string indent = "");
 
@@ -114,7 +114,6 @@ namespace vcdstar
 			std::vector<VcdstarJson*>*	m_LstVal;
 		};
 		int					m_iType;
-		char test0[16384];
 	};
 }
 

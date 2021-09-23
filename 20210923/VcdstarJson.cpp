@@ -189,7 +189,7 @@ bool VcdstarJson::LoadPath(const std::string& strPath)
 	return false;
 }
 
-bool VcdstarJson::LoadString(const std::string& strJson)
+bool VcdstarJson::LoadJson(const std::string& strJson)
 {
 	return ParseJson_(strJson);
 }
