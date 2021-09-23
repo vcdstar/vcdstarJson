@@ -111,7 +111,7 @@ namespace vcdstar
 			std::vector<VcdstarJson*>*	m_LstVal;
 		};
 		int					m_iType;
-		char test[81920];
+		// char test[81920];
 	};
 }
 
