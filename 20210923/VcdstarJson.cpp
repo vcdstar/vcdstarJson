@@ -254,6 +254,12 @@ VcdstarJson& VcdstarJson::operator[](const char* key)
 			return **it;
 		}
 	}
+
+	VcdstarJson* jsonObj = new VcdstarJson();
+	m_LstVal->push_back(jsonObj);
+	jsonObj->m_strKey = key;
+	return *jsonObj;
+
 	return *this;
 }
 
@@ -869,8 +875,10 @@ int VcdstarJson::ParseNumber(const std::string& strJson, int iIndex, VcdstarJson
 	int iRet = iIndex;
 	std::string strNum;
 	if (strJson[iRet] == '-')
+	{
 		strNum.append("-");
-	iRet++;
+		iRet++;
+	}
 
 	bool bDouble = false;
 	while ((strJson[iRet] >= '0' && strJson[iRet] <= '9') || (!bDouble && strJson[iRet] == '.'))
